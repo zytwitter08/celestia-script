@@ -3,6 +3,7 @@
 PS3='Select an action: '
 options=(
 "Install Node"
+"Update Peers"
 "Quick Sync"
 "Exit")
 
@@ -125,6 +126,14 @@ sudo systemctl status celestia-appd
 break
 ;;
 
+"Update Peers")
+PERSISTENT_PEERS=$(curl -s https://rpc-mamaki.pops.one/net_info | jq -r '.result.peers[] | .url' | tr '\n' ',')
+echo $PERSISTENT_PEERS
+sed -i.bak -e "s/^persistent-peers *=.*/persistent-peers = \"$PERSISTENT_PEERS\"/" $HOME/.celestia-app/config/config.toml
+sudo systemctl restart celestia-appd && journalctl -u celestia-appd -f -o cat
+
+break
+;;
 
 "Quick Sync")
 sudo systemctl stop celestia-appd
