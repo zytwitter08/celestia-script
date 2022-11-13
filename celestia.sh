@@ -93,6 +93,10 @@ sed -i -e "s/^pruning-interval *=.*/pruning-interval = \
 echo "================ Config Validator Mode ====================="
 sed -i.bak -e "s/^mode *=.*/mode = \"validator\"/" $HOME/.celestia-app/config/config.toml
 
+# Config Max Connection
+echo "================ Config Max Connection ====================="
+sed -i.bak -e "s/^max-connections *=.*/max-connections = 90/" $HOME/.celestia-app/config/config.toml
+
 # Setup Client
 echo "================ Setup Client ====================="
 celestia-appd config chain-id mamaki
