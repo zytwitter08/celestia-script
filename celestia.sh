@@ -127,7 +127,7 @@ break
 ;;
 
 "Update Peers")
-PERSISTENT_PEERS=$(curl -s https://rpc-mamaki.pops.one/net_info | jq -r '.result.peers[] | .url' | tr '\n' ',')
+PERSISTENT_PEERS=$(curl -s https://rpc-mamaki.pops.one/net_info | jq -r '.result.peers[] | .url' | head -n 80 | tr '\n' '_' | sed 's/_/,/g;s/,$//')
 echo $PERSISTENT_PEERS
 sed -i.bak -e "s/^persistent-peers *=.*/persistent-peers = \"$PERSISTENT_PEERS\"/" $HOME/.celestia-app/config/config.toml
 sudo systemctl restart celestia-appd && journalctl -u celestia-appd -f -o cat
