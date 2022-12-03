@@ -33,3 +33,33 @@ cd celestia-node/
 git checkout tags/v0.3.0-rc2
 make install
 make cel-key
+
+# Initialize Light Node
+echo "=============== Initialize Light Node ==============="
+celestia light init
+
+# Generate key
+echo "=============== Generate key ==============="
+cd $HOME/celestia-node
+./cel-key add celeKey --keyring-backend test --node.type light > $HOME/keys.txt
+
+# SystemD
+echo "=============== SystemD ================"
+sudo tee <<EOF >/dev/null /etc/systemd/system/celestia-lightd.service
+[Unit]
+Description=celestia-lightd Light Node
+After=network-online.target
+
+[Service]
+User=$USER
+ExecStart=$HOME/go/bin/celestia light start --core.grpc https://rpc-mamaki.pops.one:9090 --keyring.accname celeKey
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable celestia-lightd
+sudo systemctl start celestia-lightd
