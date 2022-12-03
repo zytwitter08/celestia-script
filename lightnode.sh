@@ -41,7 +41,7 @@ celestia light init
 # Generate key
 echo "=============== Generate key ==============="
 cd $HOME/celestia-node
-./cel-key add celeKey --keyring-backend test --node.type light > $HOME/keys.txt
+./cel-key add celeKey --keyring-backend test --node.type light &> $HOME/keys.txt
 
 # SystemD
 echo "=============== SystemD ================"
