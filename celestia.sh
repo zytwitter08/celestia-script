@@ -52,7 +52,7 @@ cd $HOME
 rm -rf celestia-app
 git clone https://github.com/celestiaorg/celestia-app.git
 cd celestia-app/
-APP_VERSION=v0.6.0
+APP_VERSION=v0.11.0
 git checkout tags/$APP_VERSION -b $APP_VERSION
 make install
 
@@ -65,17 +65,18 @@ rm -rf networks
 git clone https://github.com/celestiaorg/networks.git
 
 echo "monkier is $moniker"
-celestia-appd init "$moniker" --chain-id mamaki
+celestia-appd init "$moniker" --chain-id mocha
 
-cp $HOME/networks/mamaki/genesis.json $HOME/.celestia-app/config
+cp $HOME/networks/mocha/genesis.json $HOME/.celestia-app/config
 
-BOOTSTRAP_PEERS=$(curl -sL https://raw.githubusercontent.com/celestiaorg/networks/master/mamaki/bootstrap-peers.txt | tr -d '\n')
-echo $BOOTSTRAP_PEERS
-sed -i.bak -e "s/^bootstrap-peers *=.*/bootstrap-peers = \"$BOOTSTRAP_PEERS\"/" $HOME/.celestia-app/config/config.toml
+SEEDS=$(curl -sL https://raw.githubusercontent.com/celestiaorg/networks/master/mocha/seeds.txt | tr -d '\n')
+echo $SEEDS
 
-PERSISTENT_PEERS=$(curl -sL https://raw.githubusercontent.com/celestiaorg/networks/master/mamaki/peers.txt | tr -d '\n')
-echo $PERSISTENT_PEERS
-sed -i.bak -e "s/^persistent-peers *=.*/persistent-peers = \"$PERSISTENT_PEERS\"/" $HOME/.celestia-app/config/config.toml
+PEERS=$(curl -sL https://raw.githubusercontent.com/celestiaorg/networks/master/mocha/peers.txt | tr -d '\n')
+
+SEED_MODE="true"
+sed -i -e 's|^seeds *=.*|seeds = "'$SEEDS'"|; s|^persistent_peers *=.*|persistent_peers = "'$PEERS'"|' $HOME/.celestia-app/config/config.toml
+sed -i -e "s/^seed_mode *=.*/seed_mode = \"$SEED_MODE\"/" $HOME/.celestia-app/config/config.toml
 
 # Config Pruning
 echo "================ Config Pruning ====================="
@@ -89,22 +90,9 @@ sed -i -e "s/^pruning-keep-recent *=.*/pruning-keep-recent = \
 sed -i -e "s/^pruning-interval *=.*/pruning-interval = \
 \"$PRUNING_INTERVAL\"/" $HOME/.celestia-app/config/app.toml
 
-# Config Validator Mode
-echo "================ Config Validator Mode ====================="
-sed -i.bak -e "s/^mode *=.*/mode = \"validator\"/" $HOME/.celestia-app/config/config.toml
 
-# Config Max Connection
-echo "================ Config Max Connection ====================="
-sed -i.bak -e "s/^max-connections *=.*/max-connections = 90/" $HOME/.celestia-app/config/config.toml
-
-# Setup Client
 echo "================ Setup Client ====================="
-celestia-appd config chain-id mamaki
 celestia-appd config keyring-backend test
-
-# Reset Network
-echo "================ Reset Network ====================="
-celestia-appd tendermint unsafe-reset-all --home $HOME/.celestia-app
 
 # Start Node
 echo "================ Start Node ====================="
@@ -131,10 +119,6 @@ break
 ;;
 
 "Update Peers")
-PERSISTENT_PEERS=$(curl -s https://rpc-mamaki.pops.one/net_info | jq -r '.result.peers[] | .url' | head -n 80 | tr '\n' '_' | sed 's/_/,/g;s/,$//')
-echo $PERSISTENT_PEERS
-sed -i.bak -e "s/^persistent-peers *=.*/persistent-peers = \"$PERSISTENT_PEERS\"/" $HOME/.celestia-app/config/config.toml
-sudo systemctl restart celestia-appd && journalctl -u celestia-appd -f -o cat
 
 break
 ;;
@@ -145,7 +129,7 @@ cd $HOME
 rm -rf ~/.celestia-app/data
 mkdir -p ~/.celestia-app/data
 SNAP_NAME=$(curl -s https://snaps.qubelabs.io/celestia/ | \
-    egrep -o ">mamaki.*tar" | tr -d ">")
+    egrep -o ">mocha.*tar" | tr -d ">")
 wget -O - https://snaps.qubelabs.io/celestia/${SNAP_NAME} | tar xf - \
     -C ~/.celestia-app/data/
 sudo systemctl restart celestia-appd && journalctl -u celestia-appd -f -o cat
@@ -158,4 +142,3 @@ exit
 
 esac
 done
-
