@@ -32,7 +32,7 @@ sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential gi
 
 # Install Go
 echo "================ Install Go ====================="
-ver="1.18.2"
+ver="1.19.1"
 sudo rm -rf /usr/local/go
 cd $HOME
 curl https://dl.google.com/go/go$ver.linux-amd64.tar.gz | sudo tar -C /usr/local -zxvf - >/dev/null 2>&1;
@@ -75,6 +75,7 @@ echo $SEEDS
 PEERS=$(curl -sL https://raw.githubusercontent.com/celestiaorg/networks/master/mocha/peers.txt | tr -d '\n')
 
 SEED_MODE="true"
+
 sed -i -e 's|^seeds *=.*|seeds = "'$SEEDS'"|; s|^persistent_peers *=.*|persistent_peers = "'$PEERS'"|' $HOME/.celestia-app/config/config.toml
 sed -i -e "s/^seed_mode *=.*/seed_mode = \"$SEED_MODE\"/" $HOME/.celestia-app/config/config.toml
 

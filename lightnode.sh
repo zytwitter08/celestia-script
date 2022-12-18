@@ -7,7 +7,7 @@ sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential gi
 
 # Install Go
 echo "================ Install Go ====================="
-ver="1.18.2"
+ver="1.19.1"
 sudo rm -rf /usr/local/go
 cd $HOME
 wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz"
@@ -30,7 +30,7 @@ cd $HOME
 rm -rf celestia-node
 git clone https://github.com/celestiaorg/celestia-node.git
 cd celestia-node/
-git checkout tags/v0.3.0-rc2
+git checkout tags/v0.6.0
 make install
 make cel-key
 
@@ -38,7 +38,7 @@ make cel-key
 echo "=============== Initialize Light Node ==============="
 celestia light init
 
-# Generate key
+# Start the Light Node
 echo "=============== Generate key ==============="
 cd $HOME/celestia-node
 ./cel-key add celeKey --keyring-backend test --node.type light &> $HOME/keys.txt
@@ -52,7 +52,7 @@ After=network-online.target
 
 [Service]
 User=$USER
-ExecStart=$HOME/go/bin/celestia light start --core.grpc https://rpc-mamaki.pops.one:9090 --keyring.accname celeKey
+ExecStart=$HOME/go/bin/celestia light start --core.ip https://rpc-mocha.pops.one:9090 --keyring.accname celeKey
 Restart=on-failure
 RestartSec=3
 LimitNOFILE=4096
