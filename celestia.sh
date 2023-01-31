@@ -94,6 +94,7 @@ sed -i -e "s/^pruning-interval *=.*/pruning-interval = \
 
 echo "================ Setup Client ====================="
 celestia-appd config keyring-backend test
+celestia-appd config chain-id mocha
 
 # Start Node
 echo "================ Start Node ====================="
